@@ -31,7 +31,7 @@ This number is not prime :(
 
 ## Authors
 
-* **Jordan Christensen** - *Initial work* - [mazjap](https://github.com/mazjap)
+* [**Jordan Christensen** (mazjap)](https://github.com/mazjap)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
