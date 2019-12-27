@@ -1,0 +1,123 @@
+;  isPrime					; The readme has a lot of information, but it's
+;  Jordan Christensen				; a bit vague. Here goes me explaining things in
+;  Project 3					; more depth, just in case.
+;  
+
+			.ORIG x3000		; Begin execution of the program
+			AND R5, R5, #0		; Setting registers 5 and 6 to 0 separately
+			AND R6, R6, #0		; because I want to keep the values when running startFresh
+			JSR startFresh		; A subprocess that sets registers 0-4 to be 0
+			JSR input		; A subprocess to get the input number from the user
+			JSR startFresh		; Clearing registers again after getting input
+			JSR divideTwo		; A subprocess to divide the number by two (useful later)
+			JSR prePrime		; Setting up to run the testPrime subprocess
+			JSR testPrime		; Tests to see if number provided is prime
+
+;
+startFresh		AND R0, R0, #0		; Set R0 = 0
+			AND R1, R1, #0		; Set R1 = 0
+			AND R2, R2, #0		; Set R2 = 0
+			AND R3, R3, #0		; Set R3 = 0
+			AND R4, R4, #0		; Set R4 = 0
+			RET			; Return to address stored in R7 (x3003)
+;
+input			LEA R0, n100		; Loads the address of label n100 shown later
+			PUTS			; Writes n100's string to console
+			IN			; Takes user input (in ASCII)
+			JSR getDec		; A subprocess to convert the ASCII char to decimal
+			LD R1, val100		; Load the value 100 into R1 from label val100
+			AND R4, R4, #0		; Set R4 to 0
+			JSR multiplyR1		; A subprocess to add the digit to itself 100 times
+			ADD R5, R4, #0		; Adding the new number to R5
+
+			LEA R0, n10		; Loads the address of label n10 shown later
+			PUTS			; Writes n10's string to console
+			IN			; Takes user input (in ASCII)
+			JSR getDec		; Convert the ASCII char to decimal
+			LD R1, val10		; Load the value 10 into R1 from label val10
+			AND R4, R4, #0		; Set R4 to 0 again
+			JSR multiplyR2		; A subprocess to add the digit to itself 10 times
+			ADD R5, R5, R4		; Adding this new number to R5 with previous number
+
+			LEA R0, n1		; Loads the address of label n1 shown later
+			PUTS			; Writes n1's string to console
+			IN			; Takes user input (in ASCII)
+			JSR getDec		; Convert ASCII to dec
+
+			ADD R5, R5, R0		; Adding new number to R5 to complete the number with the
+						; 100's place, 10's place and 1's place
+
+			AND R7, R7, #0		; Because the program has been jumping around subprocesses, R7 doesn't
+			LD R7, startReturn	; know where to return to. Here the register is cleared, and 3000
+			ADD R7, R7, #4		; is loaded into it, then 4 is added to get the program back to
+			JMP R7			; where it should be. JMP R7 takes the program to R7's address
+;
+getDec			LD R4, A		; A, a label which contains the value 48, is loaded into R4
+			NOT R4, R4		; R4 is inversed to get the negative minus one (-49)
+			ADD R4, R4, #1		; One is added to complete two's compliment (-48)
+                       	ADD R0, R4, R0		; R0 contains the ASCII value of a number. Subtracting 48
+                       	RET			; turns it back into dec. Then the program returns
+;
+multiplyR1		ADD R4, R4, R0		; Adds R0 into R4 repeatedly
+			ADD R1, R1, #-1		; R1 (which had the value of 100) is decremented
+			BRp multiplyR1		; While R1 is positive, multiplyR1 is called
+			RET			; The program returns
+;
+multiplyR2		ADD R4, R4, R0		; Adds R0 into R4 repeatedly
+			ADD R1, R1, #-1		; R1 (which had the value of 10) is decremented
+			BRp multiplyR2		; While R1 is positive, multiplyR2 is called
+			RET			; The program is returned
+;
+prePrime		AND R1, R1, #0		; R1 is set to be 0
+			ADD R1, R1, #-2		; R1 is then given the value of -2
+			ADD R3, R5, #0		; In order to keep R5 untouched, the value is copied to R3
+			RET			; These are the lines of code that couldn't go into testPrime
+;
+testPrime		ADD R3, R3, R1		; R3, which contains the user's number, is subtracted by R1
+			BRp testPrime		; While R3 is still positive, testPrime will continue to execute
+			BRz notPrime		; If R3 becomes equalled to 0, that means the user's number subtracted
+						; repeatedly by a number, was divisible by that number.
+			JSR incrementPrime	; A subprocess that increments the value in R1 (only called when R3 is negative)
+;
+incrementPrime		ADD R3, R5, #0		; Set R3 to be the user's value again for another test
+			ADD R1, R1, #-1		; Decrements R1 by 1
+			AND R4, R4, #0		; Sets R4 equal to 0
+			ADD R4, R1, R6		; If R1(the value to subtract)+R6(half of user's number)=0 or lower, 
+			BRnz isPrime		; then the user's number is prime.
+			JSR testPrime		; Calls testPrime if R1+R6!=0 or lower
+;
+divideTwo		NOT R6, R5		; Set R6 equal to the inverse of R5
+			ADD R6, R6, #1		; Add 1 to R6 for two's compliment
+			AND R3, R3, #0		; Sets R3 equal to 0
+			ADD R1, R1, #2		; Adds 2 to R1
+			ADD R0, R0, #1		; Adds 1 to R0
+			ADD R3, R6, R1		; Checks to see if R1 is the same size as R6
+			BRn divideTwo		; If it is, then the value in R0 will be half of the user's number
+			AND R6, R6, #0		; Set R6 to 0 to set R0 to it so we can run startFresh to clear R0-4
+			ADD R6, R0, #0		; Set R6 to R0
+			JSR startFresh		; Running startFresh
+			
+			LD R7, startReturn	; Loading x3000 into R7
+			ADD R7, R7, #6		; Adding 6 to the value of R7
+			JMP R7			; Jumping to the address contained in R7
+;
+notPrime		LEA R0, notP		; Loads the address of label notP
+			PUTS			; Writes notP's string to console
+			HALT			; Stops the program from continuing to execute
+;
+isPrime			LEA R0, isP		; Loads the address of label isP
+			PUTS			; Writes isP's string to console
+			HALT			; Stops the program from continuing to execute
+;
+A			.FILL #48		; The value to convert from ASCII to decimal
+startReturn		.FILL x3000		; The starting value of the program, useful for using JMP with R7
+val100			.FILL #100		; The value of 100 to increment the first digit to add itself 100 times
+val10			.FILL #10		; The value of 10 to increment the second digit to add itself 10 times
+						; Below are the strings
+n100			.STRINGZ "Enter Hundreds Place Digit (If none, press 0):\n"
+n10			.STRINGZ "\nEnter Tens Place Digit (If none, press 0):\n"
+n1			.STRINGZ "\nEnter Ones Place Digit (If none, press 0):\n"
+notP			.STRINGZ "\nThis number is not prime :(\n"
+isP			.STRINGZ "\nThis number is prime!\n"
+;
+			.END
