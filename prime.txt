@@ -1,11 +1,10 @@
-;  isPrime					; The readme has a lot of information, but it's
-;  Jordan Christensen				; a bit vague. Here goes me explaining things in
-;  Project 3					; more depth, just in case.
-;  
+;  isPrime					; This program was heavily commented for people to learn from.
+;  Jordan Christensen				; Feel free mess around with this program to get a good
+;        					; understanding of assembly code and how it works.
 
 			.ORIG x3000		; Begin execution of the program
-			AND R5, R5, #0		; Setting registers 5 and 6 to 0 separately
-			AND R6, R6, #0		; because I want to keep the values when running startFresh
+			AND R5, R5, #0		; Setting registers 5 and 6 to 0 separately because
+			AND R6, R6, #0		; I want to keep the values when running startFresh
 			JSR startFresh		; A subprocess that sets registers 0-4 to be 0
 			JSR input		; A subprocess to get the input number from the user
 			JSR startFresh		; Clearing registers again after getting input
@@ -114,9 +113,9 @@ startReturn		.FILL x3000		; The starting value of the program, useful for using 
 val100			.FILL #100		; The value of 100 to increment the first digit to add itself 100 times
 val10			.FILL #10		; The value of 10 to increment the second digit to add itself 10 times
 						; Below are the strings
-n100			.STRINGZ "Enter Hundreds Place Digit (If none, press 0):\n"
-n10			.STRINGZ "\nEnter Tens Place Digit (If none, press 0):\n"
-n1			.STRINGZ "\nEnter Ones Place Digit (If none, press 0):\n"
+n100			.STRINGZ "Enter Hundreds Place Digit (Or Enter if None):\n"
+n10			.STRINGZ "\nEnter Tens Place Digit (Or Enter if None):\n"
+n1			.STRINGZ "\nEnter Ones Place Digit (Or Enter if None):\n"
 notP			.STRINGZ "\nThis number is not prime :(\n"
 isP			.STRINGZ "\nThis number is prime!\n"
 ;
