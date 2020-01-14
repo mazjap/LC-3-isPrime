@@ -41,4 +41,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-* Thanks to Bruce Embry for teaching me LC-3!
+* Thanks to [Bruce Embry](https://www.linkedin.com/in/bruce-embry-3789238/) for teaching me LC-3!
